@@ -47,10 +47,25 @@ def mat_ops_demo():
 	m4 = tf.subtract(m1, m2)
 	m5 = tf.multiply(m1, m2)
 	m6 = tf.divide(m1, m2)
+
+	mm = tf.matmul(m1, m2)
+
 	init = tf.global_variables_initializer();
 	sess = tf.Session()
 	sess.run(init)
 	print(sess.run([m3, m4, m5, m6]))
+	print(sess.run(mm))
 
 
-mat_ops_demo()
+def placeholder_demo():
+	a = tf.placeholder(shape=[3, 3], dtype=tf.float32)
+	b = tf.placeholder(shape=[3, 2], dtype=tf.float32)
+	mm = tf.matmul(a, b)
+	init = tf.global_variables_initializer();
+	sess = tf.Session()
+	sess.run(init)
+	result = sess.run(mm, feed_dict={a: [[1,1,1],[2,2,2],[3,3,3]], b:[[4,4],[5,5],[6,6]]})
+	print(result)
+
+
+placeholder_demo()
