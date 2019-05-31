@@ -3,13 +3,16 @@ import requests
 import sys
 import os
 import threadpool
+import platform
 from requests import urllib3
 
 urllib3.disable_warnings()
 
 
 def concat(video_name='out.mp4'):
-    current_path = sys.path[0].replace('\\', '\\\\') + '\\\\'
+    current_path = sys.path[0] + '/'
+    if palt.system() == 'Windows':
+        current_path = sys.path[0].replace('\\', '\\\\') + '\\\\'
     input_file = current_path + 'ts.txt'
     output_file = current_path + video_name
     try:
@@ -45,7 +48,7 @@ def download(url, thread_num=5):
 
 
 def download_worker(url, index):
-    current_dir = sys.path[0].replace('\\', '\\\\') + '\\\\'
+    current_dir = sys.path[0].replace('\\', '/') + '/'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/74.0.3729.131 Safari/537.36',
@@ -57,7 +60,7 @@ def download_worker(url, index):
 
 
 def generate_txt():
-    current_path = sys.path[0].replace('\\', '\\\\') + '\\\\'
+    current_path = sys.path[0].replace('\\', '/') + '/'
     files = os.listdir(current_path)
     files = list(sorted(filter(lambda x: x.endswith('.ts'), files)))
     with open(current_path + 'ts.txt', 'w') as txt:
@@ -66,26 +69,16 @@ def generate_txt():
 
 
 def clear():
-    current_path = sys.path[0].replace('\\', '\\\\') + '\\\\'
+    current_path = sys.path[0].replace('\\', '/') + '/'
     files = os.listdir(current_path)
     for file in files:
-        if file.endswith('.ts') or file.endswith('.txt'):
+        # if file.endswith('.ts') or file.endswith('.txt'):
+        if file.endswith('.ts'):
             os.remove(current_path + file)
 
 
 if __name__ == '__main__':
-    # download("https://media.wanmen.org/4f6a1de2-28a5-4f28-ab6d-f5b3d2fb7e0b_pc_high.m3u8")
-    # generate_txt()
-    # concat('物理预测的胜利与失效.mp4')
-    # clear()
-    url = "https://api.wanmen.org/4.0/content/courses/593e086f206e46163b6dd5c8"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/74.0.3729.131 Safari/537.36',
-        'Connection': 'Keep-Alive'
-    }
-    lectures = requests.get(url=url, headers=headers, verify=False).json()['lectures']
-    for lecture in lectures:
-        print(lecture['name'])
-        for course in lecture['children']:
-            print('\t' + course['name'] + ' ' + course['hls']['pcHigh'])
+    download("https://media.wanmen.org/a81d11d0-f1bb-4469-b630-f1dd674081bb_pc_high.m3u8")
+    generate_txt()
+    concat('1.4 生活实例与本章答疑.mp4')
+    clear()
