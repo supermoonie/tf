@@ -8,10 +8,12 @@ from requests import urllib3
 
 urllib3.disable_warnings()
 
+from datetime import datetime
+
 
 def concat(video_name='out.mp4'):
     current_path = sys.path[0] + '/'
-    if palt.system() == 'Windows':
+    if platform.system() == 'Windows':
         current_path = sys.path[0].replace('\\', '\\\\') + '\\\\'
     input_file = current_path + 'ts.txt'
     output_file = current_path + video_name
