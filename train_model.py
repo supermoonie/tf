@@ -75,7 +75,7 @@ class TrainModel(CNN):
         :return:tuple (str, numpy.array)
         """
         # 标签
-        label = img_name.split("_")[0]
+        label = img_name.split("-")[0]
         # 文件
         img_file = os.path.join(img_path, img_name)
         captcha_image = Image.open(img_file)
@@ -254,10 +254,10 @@ def main():
     else:
         char_set = sample_conf["char_set"]
 
-    if not enable_gpu:
-        # 设置以下环境变量可开启CPU识别
-        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    # if not enable_gpu:
+    #     # 设置以下环境变量可开启CPU识别
+    #     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    #     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
     tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, image_suffix, verify=False)
     tm.train_cnn()  # 开始训练模型
