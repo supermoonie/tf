@@ -2,7 +2,6 @@ import os
 import re
 import cv2
 
-
 capture_path = 'D:/BaiduNetdiskDownload/20181211/data/export/crawler_captcha/correct/'
 un_support_capture_name_list = [f for f in os.listdir(capture_path) if not re.match(r'^[0-9a-zA-Z]{4}$', f.split('-')[0])]
 un_support_capture_path_list = [capture_path + f for f in un_support_capture_name_list]
