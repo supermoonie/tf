@@ -36,18 +36,12 @@ def full_connection():
     # saver = tf.train.Saver()
 
     with tf.Session() as sess:
-        if FLAGS.is_train == 1:
-                sess.run(init)
-                image, label = mnist.train.next_batch(100)
-                print('训练之前， 损失值: %f' % sess.run(error, feed_dict={x: image, y_true: label}))
-                for i in range(3000):
-                    _, loss, accuracy_value = sess.run([optimizer, error, accuracy], feed_dict={x: image, y_true: label})
-                    print('第 %d 次训练，损失值为: %f, 准确率为: %f, ' % (i + 1, loss, accuracy_value))
-        else:
-            pass
-            # for i in range(100):
-            #     mnist_x, mnist_y = mnist.test.next_batch(1)
-            #     print('第 %d 个样本的真实值：%d，模型预测结果为：%d' % (i + 1, tf.argmax(sess.run(y_true, feed_dict={x: mnist_x, y_true: mnist_y}), )))
+        sess.run(init)
+        image, label = mnist.train.next_batch(100)
+        print('训练之前， 损失值: %f' % sess.run(error, feed_dict={x: image, y_true: label}))
+        for i in range(3000):
+            _, loss, accuracy_value = sess.run([optimizer, error, accuracy], feed_dict={x: image, y_true: label})
+            print('第 %d 次训练，损失值为: %f, 准确率为: %f, ' % (i + 1, loss, accuracy_value))
 
     return None
 

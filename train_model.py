@@ -11,6 +11,10 @@ import os
 from network import CNN
 
 
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
+plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+
+
 class TrainError(Exception):
     pass
 
@@ -207,9 +211,6 @@ class TrainModel(CNN):
     def recognize_captcha(self):
         label, captcha_array = self.gen_captcha_text_image(self.train_img_path, random.choice(self.train_images_list))
 
-        f = plt.figure()
-        ax = f.add_subplot(111)
-        ax.text(0.1, 0.9, "origin:" + label, ha='center', va='center', transform=ax.transAxes)
         plt.imshow(captcha_array)
         # 预测图片
         image = self.convert2gray(captcha_array)
@@ -230,7 +231,7 @@ class TrainModel(CNN):
         for p in predict_text:
             p_text += str(self.char_set[p])
         print(p_text)
-        plt.text(20, 1, 'predict:{}'.format(p_text))
+        plt.title('真实值:{} 预测值:{}'.format(label, p_text))
         plt.show()
 
 
@@ -261,7 +262,7 @@ def main():
 
     tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, image_suffix, verify=False)
     tm.train_cnn()  # 开始训练模型
-    # tm.recognize_captcha()  # 识别图片示例
+    tm.recognize_captcha()  # 识别图片示例
 
 
 if __name__ == '__main__':
