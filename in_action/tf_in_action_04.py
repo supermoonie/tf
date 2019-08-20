@@ -2,11 +2,13 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 import sklearn.preprocessing as prep
+import matplotlib.pyplot as plt
 
 
 # Xavier 初始化器会根据某一层网络的输入、输出节点数量自动调整最合适的分布。
 # 如果深度学习模型的权重初始化得太小，信号将在每层间传递时主键缩小而难以产生作用
 # 如果权重初始化得太大，信号将在每层间传递时逐渐放大并导致发散和失效
+# 均匀分布的 Xavier 初始化器
 def xavier_init(fan_in, fan_out, constant=1):
     low = -constant * np.sqrt(6.0 / (fan_in + fan_out))
     high = constant * np.sqrt(6.0 / (fan_in + fan_out))
@@ -134,4 +136,15 @@ if __name__ == '__main__':
         if epoch % display_step == 0:
             print('epoch: {}, avg_cost: {}'.format((epoch + 1), avg_cost))
     print('total cost: ' + str(auto_encoder.calc_total_loss(X_test)))
+    print('w1: ' + str(auto_encoder.get_weights()))
+    print('b1: ' + str(auto_encoder.get_biases()))
+
+    batch_test = get_random_block_from_data(X_test, 5)
+    encoder_test = auto_encoder.reconstruct(batch_test)
+    fig, ax = plt.subplots(nrows=2, ncols=5)
+    for i in range(5):
+        ax[0][i].imshow(batch_test[i].reshape((28, 28)), cmap='Greys', interpolation='nearest')
+        ax[1][i].imshow(encoder_test[i].reshape((28, 28)), cmap='Greys', interpolation='nearest')
+    plt.tight_layout()
+    plt.show()
 
