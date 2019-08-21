@@ -80,6 +80,7 @@ class CNN(object):
         conv3 = tf.nn.dropout(conv3, self.keep_prob)
         print(">>> convolution 3: ", conv3.shape)
         next_shape = conv3.shape[1] * conv3.shape[2] * conv3.shape[3]
+        print(">>> next_shape: ", next_shape)
 
         # 全连接层1
         wd1 = tf.get_variable(name='wd1', shape=[next_shape, 1024], dtype=tf.float32,

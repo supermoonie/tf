@@ -28,12 +28,12 @@ def cnn():
         # 全连接层 2
         W_fc2 = weigth_variable([1024, 10])
         b_fc2 = bias_variable([10])
-        y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2, name='softmax')
+        y = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2, name='softmax')
         # 损失函数
-        cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))
+        cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
         train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
         # 准确率计算
-        current_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
+        current_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
         accuracy = tf.reduce_mean(tf.cast(current_prediction, tf.float32))
 
         tf.global_variables_initializer().run()
@@ -43,7 +43,8 @@ def cnn():
                 train_accuracy = sess.run(accuracy, feed_dict={x: batch[0], y_: batch[1], keep_prod: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             sess.run(train_step, feed_dict={x: batch[0], y_: batch[1], keep_prod: 0.5})
-        print('test accuracy %g' % (sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels,
+        print('test accuracy %g' % (sess.run(accuracy, feed_dict={x: mnist.test.images[0:200],
+                                                                  y_: mnist.test.labels[0:200],
                                                                   keep_prod: 1.0})))
 
 

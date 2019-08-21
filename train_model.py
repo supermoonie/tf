@@ -156,11 +156,11 @@ class TrainModel(CNN):
         # 模型保存对象
         saver = tf.train.Saver()
         with tf.Session() as sess:
-            print('-------------------------')
-            ops = sess.graph.get_operations()
-            for op in ops:
-                print(op.name, op.outputs)
-            print('-------------------------')
+            # print('-------------------------')
+            # ops = sess.graph.get_operations()
+            # for op in ops:
+            #     print(op.name, op.outputs)
+            # print('-------------------------')
             init = tf.global_variables_initializer()
             sess.run(init)
             # 恢复模型
