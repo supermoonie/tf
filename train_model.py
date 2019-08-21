@@ -156,6 +156,11 @@ class TrainModel(CNN):
         # 模型保存对象
         saver = tf.train.Saver()
         with tf.Session() as sess:
+            print('-------------------------')
+            ops = sess.graph.get_operations()
+            for op in ops:
+                print(op.name, op.outputs)
+            print('-------------------------')
             init = tf.global_variables_initializer()
             sess.run(init)
             # 恢复模型
@@ -261,8 +266,8 @@ def main():
     #     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
     tm = TrainModel(train_image_dir, verify_image_dir, char_set, model_save_dir, cycle_stop, acc_stop, cycle_save, image_suffix, verify=False)
-    # tm.train_cnn()  # 开始训练模型
-    tm.recognize_captcha()  # 识别图片示例
+    tm.train_cnn()  # 开始训练模型
+    # tm.recognize_captcha()  # 识别图片示例
 
 
 if __name__ == '__main__':

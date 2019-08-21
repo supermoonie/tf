@@ -36,30 +36,38 @@ class AdditiveGaussianNoiseAutoEncoder(object):
         self.sess = tf.Session()
         self.sess.run(init)
 
+    # 执行单次训练
     def partial_fit(self, X):
         loss, opt = self.sess.run((self.loss, self.optimizer), feed_dict={self.x: X, self.scale: self.training_scale})
         return loss
 
+    # 计算总损失
     def calc_total_loss(self, X):
         return self.sess.run(self.loss, feed_dict={self.x: X, self.scale: self.training_scale})
 
+    # 转化
     def transform(self, X):
         return self.sess.run(self.hidden, feed_dict={self.x: X, self.scale: self.training_scale})
 
+    # 生成
     def generate(self, hidden=None):
         if hidden is None:
             hidden = np.random.normal(size=self.weights['b1'])
         return self.sess.run(self.reconstruction, feed_dict={self.hidden: hidden})
 
+    # 重建
     def reconstruct(self, X):
         return self.sess.run(self.reconstruction, feed_dict={self.x: X, self.scale: self.training_scale})
 
+    # 获取权重
     def get_weights(self):
         return self.sess.run(self.weights['w1'])
 
+    # 获取偏置
     def get_biases(self):
         return self.sess.run(self.weights['b1'])
 
+    # 初始化权重
     def _initialize_weights(self):
         all_weights = dict()
         all_weights['w1'] = tf.Variable(xavier_init(self.n_input, self.n_hidden))
@@ -81,7 +89,44 @@ def get_random_block_from_data(data, batch_size):
     return data[start_index:(start_index + batch_size)]
 
 
+def tf_auto_encoder():
+    mnist = input_data.read_data_sets('../mnist/', one_hot=True)
+    X_train, X_test = standard_scale(mnist.train.images, mnist.test.images)
+    n_samples = int(mnist.train.num_examples)
+    training_epochs = 20
+    batch_size = 128
+    display_step = 1
+
+    auto_encoder = AdditiveGaussianNoiseAutoEncoder(n_input=784, n_hidden=200, transfer_function=tf.nn.softplus,
+                                                    optimizer=tf.train.AdamOptimizer(learning_rate=0.001), scale=0.01)
+    for epoch in range(training_epochs):
+        avg_cost = 0.
+        total_batch = int(n_samples / batch_size)
+        for i in range(total_batch):
+            batch_xs = get_random_block_from_data(X_train, batch_size)
+            cost = auto_encoder.partial_fit(batch_xs)
+            avg_cost += cost / n_samples * batch_size
+        if epoch % display_step == 0:
+            print('epoch: {}, avg_cost: {}'.format((epoch + 1), avg_cost))
+    print('total cost: ' + str(auto_encoder.calc_total_loss(X_test)))
+    print('w1: ' + str(auto_encoder.get_weights()))
+    print('b1: ' + str(auto_encoder.get_biases()))
+
+    batch_test = get_random_block_from_data(X_test, 5)
+    encoder_test = auto_encoder.reconstruct(batch_test)
+    fig, ax = plt.subplots(nrows=2, ncols=5)
+    for i in range(5):
+        ax[0][i].imshow(batch_test[i].reshape((28, 28)), cmap='Greys', interpolation='nearest')
+        ax[1][i].imshow(encoder_test[i].reshape((28, 28)), cmap='Greys', interpolation='nearest')
+    plt.tight_layout()
+    plt.show()
+
+
 def multi_layer_perceptron():
+    """
+    多层感知机
+    :return:
+    """
     mnist = input_data.read_data_sets('../mnist/', one_hot=True)
     with tf.Session() as sess:
         in_units = 784
@@ -117,34 +162,6 @@ def multi_layer_perceptron():
 
 
 if __name__ == '__main__':
-    mnist = input_data.read_data_sets('../mnist/', one_hot=True)
-    X_train, X_test = standard_scale(mnist.train.images, mnist.test.images)
-    n_samples = int(mnist.train.num_examples)
-    training_epochs = 20
-    batch_size = 128
-    display_step = 1
-
-    auto_encoder = AdditiveGaussianNoiseAutoEncoder(n_input=784, n_hidden=200, transfer_function=tf.nn.softplus,
-                                                    optimizer=tf.train.AdamOptimizer(learning_rate=0.001), scale=0.01)
-    for epoch in range(training_epochs):
-        avg_cost = 0.
-        total_batch = int(n_samples / batch_size)
-        for i in range(total_batch):
-            batch_xs = get_random_block_from_data(X_train, batch_size)
-            cost = auto_encoder.partial_fit(batch_xs)
-            avg_cost += cost / n_samples * batch_size
-        if epoch % display_step == 0:
-            print('epoch: {}, avg_cost: {}'.format((epoch + 1), avg_cost))
-    print('total cost: ' + str(auto_encoder.calc_total_loss(X_test)))
-    print('w1: ' + str(auto_encoder.get_weights()))
-    print('b1: ' + str(auto_encoder.get_biases()))
-
-    batch_test = get_random_block_from_data(X_test, 5)
-    encoder_test = auto_encoder.reconstruct(batch_test)
-    fig, ax = plt.subplots(nrows=2, ncols=5)
-    for i in range(5):
-        ax[0][i].imshow(batch_test[i].reshape((28, 28)), cmap='Greys', interpolation='nearest')
-        ax[1][i].imshow(encoder_test[i].reshape((28, 28)), cmap='Greys', interpolation='nearest')
-    plt.tight_layout()
-    plt.show()
+    tf_auto_encoder()
+    # multi_layer_perceptron()
 
