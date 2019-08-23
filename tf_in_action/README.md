@@ -111,3 +111,40 @@ TensorFlow 常数生成函数：
 
 ![tf_in_action_03](./images./tf_in_action_03.png)
 
+### 2.2 损失函数的定义
+
+**交叉熵（cross entropy）** ，用于描述两个概率之间的距离。
+
+给定两个概率分布 p 和 q，通过 q 来标识 p 的交叉熵为：
+$$
+H(p, q) = -\sum_{x}{p(x)\log{q(x)}}
+$$
+交叉熵描述的是两个概率之间的距离，然而神经网络的输出不一定是一个概率分布，Softmax 回归可以将神经网络前向传播的结果变成概率分布。
+
+Softmax 回归的神经网络结构图：
+
+![tf_in_action_04](./images/tf_in_action_04.png)
+
+假设神经网络的原始输出为 $y_i, y_2, \cdots, y_n$ ，那么经过Softmax 回归处理之后的输出为：
+$$
+softmax(y)_i = y_i^{\prime} = \frac{e^{y_i}}{\sum_{j = 1}^{n}{e^{y_i}}}
+$$
+当交叉熵作为神经网络的损失函数时，p 代表的是正确答案，q 代表的是预测值。交叉熵代表两个概率分布的距离，交叉熵越小，两个概率分布越接近。
+
+```python
+# 交叉熵实现
+cross_entropy = -tf.reduce_mean(y_ * tf.log(tf.clip_by_value(y, 1e-10, 1.0)))
+```
+
+tf.clip_by_value 函数可以将一个张量中的数值限制在一个范围内，避免一些错误运算（$\log0$） 
+
+\* 与 tf.matmul 的区别：\* 是元素间直接相乘，tf.matmul 是矩阵乘法
+
+因为交叉熵一般会与 softmax 回归一起使用，TensorFlow 对这两个功能进行了统一封装 tf.nn.softmax_cross_entropy_with_logits ，对于只有一个正确答案的分类问题中，TensorFlow 提供了 tf.nn.sparse_softmax_cross_entropy_with_logits 来进一步加速计算过程。
+
+对于回归问题，最常用的损失函数是 **均方误差（MSE，mean squared error）** ：
+$$
+MSE(y, y^{\prime}) = \frac{\sum_{i = 1}^{n}{(y_i - y_i^{\prime})^2}}{n}
+$$
+其中 $y_i$ 为一个 batch 中第 i 个数据的正确答案，$y_i^{\prime}$ 为神经网络给出的预测值。
+
