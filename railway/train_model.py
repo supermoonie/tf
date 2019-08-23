@@ -62,23 +62,32 @@ class TrainModel(CNN):
         """
         batch_x = np.zeros([size, self.img_height * self.img_width])  # 初始化
         batch_y = np.zeros([size, len(self.class_set)])  # 初始化
-        idx = np.random.randint(low=size, high=len(self.train_img_set) - size)
+        idx = np.random.randint(low=size, high=len(img_set) - size)
         index = 0
         for label, img_path in img_set[idx: idx + size]:
             captcha_image = Image.open(img_path)
-            # gray_image = captcha_image.convert('L')
             captcha_array = np.array(captcha_image)
             image_array = self.convert2gray(captcha_array)
-            # batch_x[index, :] = image_array.flatten() / 255
-            batch_x[index, :] = image_array.flatten()
+            batch_x[index, :] = image_array.flatten() / 255
             batch_y[index, :] = self.text2vec(label)
             index = index + 1
         return batch_x, batch_y
 
+    @staticmethod
+    def get_one_img(img_set):
+        idx = np.random.randint(low=1, high=len(img_set) - 1)
+        label, img_path = img_set[idx]
+        print(img_path)
+        captcha_image = Image.open(img_path)
+        captcha_array = np.array(captcha_image)
+        return captcha_array, label
+
     def train(self):
         y_predict = self.model()
-        cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=y_predict, labels=self.Y_))
-        optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(cost)
+        print('y_predict.shape: ', y_predict.shape)
+        cost = -tf.reduce_sum(self.Y_*tf.log(tf.clip_by_value(y_predict, 1e-10, 1.0)))
+        # cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=y_predict, labels=self.Y_))
+        optimizer = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(cost)
         # 计算准确率
         current_prediction = tf.equal(tf.argmax(y_predict, 1), tf.argmax(self.Y_, 1))
         accuracy = tf.reduce_mean(tf.cast(current_prediction, tf.float32))
@@ -116,9 +125,29 @@ class TrainModel(CNN):
                 step += 1
             saver.save(sess, self.model_save_dir)
 
+    def recognize_captcha(self):
+        captcha_array, label = self.get_one_img(self.test_img_set)
+        plt.imshow(captcha_array)
+        gray_img = self.convert2gray(captcha_array)
+        captcha_array = gray_img.flatten() / 255
+        print('captcha_array.shape: ', captcha_array.shape)
+
+        y_predict = self.model()
+
+        saver = tf.train.Saver()
+        with tf.Session() as sess:
+            saver.restore(sess, self.model_save_dir)
+            predict = tf.argmax(y_predict, axis=1)
+            text_list = sess.run(predict, feed_dict={self.X: [captcha_array], self.keep_prob: 1.})
+            predict_text = text_list[0].tolist()
+
+        print("正确: {}  预测: {}".format(label, self.class_set[predict_text]))
+        plt.title("正确: {}  预测: {}".format(label, self.class_set[predict_text]))
+        plt.show()
+
 
 def main():
-    train = TrainModel('D:/mac_temp/captcha/', 10000, 0.99, 500)
+    train = TrainModel('D:/BaiduNetdiskDownload/captcha/', 10000, 0.99, 500)
     # class_set = train.collection_all_img()
     # print(class_set)
     # print(len(class_set))
@@ -133,7 +162,8 @@ def main():
     # print(train.class_set)
     # print(batch_y[0])
     # plt.show()
-    train.train()
+    # train.train()
+    train.recognize_captcha()
 
 
 if __name__ == '__main__':
