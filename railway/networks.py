@@ -39,49 +39,43 @@ class CNN(object):
         vector[idx] = 1
         return vector
 
+    def weigth_variable(self, shape, name=None):
+        initial = tf.truncated_normal(shape=shape, stddev=0.1)
+        return tf.Variable(initial_value=initial, name=name)
+
+    def bias_variable(self, shape, name=None):
+        initial = tf.constant(0.1, shape=shape)
+        return tf.Variable(initial_value=initial, name=name)
+
+    def conv2d(self, x, W):
+        return tf.nn.conv2d(input=x, filter=W, strides=[1, 1, 1, 1], padding='SAME')
+
+    def max_pool_2x2(self, x):
+        return tf.nn.max_pool(value=x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+
     def model(self):
         x = tf.reshape(self.X, shape=[-1, self.img_height, self.img_width, 1])
 
-        # 卷积层1
-        w_1 = tf.get_variable(name='w_1', shape=[3, 3, 1, 32], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
-        b_1 = tf.Variable(self.b_alpha * tf.random_normal([32]))
-        h_1 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(x, w_1, strides=[1, 1, 1, 1], padding='SAME'), b_1))
-        h_1 = tf.nn.max_pool(h_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        h_1 = tf.nn.dropout(h_1, self.keep_prob)
-
-        # 卷积层2
-        w_2 = tf.get_variable(name='w_2', shape=[3, 3, 32, 64], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
-        b_2 = tf.Variable(self.b_alpha * tf.random_normal([64]))
-        h_2 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(h_1, w_2, strides=[1, 1, 1, 1], padding='SAME'), b_2))
-        h_2 = tf.nn.max_pool(h_2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        h_2 = tf.nn.dropout(h_2, self.keep_prob)
-
-        # 卷积层3
-        w_3 = tf.get_variable(name='w_3', shape=[3, 3, 64, 128], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
-        b_3 = tf.Variable(self.b_alpha * tf.random_normal([128]))
-        h_3 = tf.nn.relu(tf.nn.bias_add(tf.nn.conv2d(h_2, w_3, strides=[1, 1, 1, 1], padding='SAME'), b_3))
-        h_3 = tf.nn.max_pool(h_3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        h_3 = tf.nn.dropout(h_3, self.keep_prob)
-        print(">>> convolution 3: ", h_3.shape)
-        next_shape = h_3.shape[1] * h_3.shape[2] * h_3.shape[3]
-        print(">>> next_shape: ", next_shape)
-
-        # 全连接层1
-        w_4 = tf.get_variable(name='w_4', shape=[next_shape, 1024], dtype=tf.float32,
-                              initializer=tf.contrib.layers.xavier_initializer())
-        b_4 = tf.Variable(self.b_alpha * tf.random_normal([1024]))
-        dense = tf.reshape(h_3, [-1, w_4.get_shape().as_list()[0]])
-        dense = tf.nn.relu(tf.add(tf.matmul(dense, w_4), b_4))
-        dense = tf.nn.dropout(dense, self.keep_prob)
-
-        # 全连接层2
-        w_out = tf.get_variable('w_out', shape=[1024, len(self.class_set)], dtype=tf.float32,
-                                initializer=tf.contrib.layers.xavier_initializer())
-        b_out = tf.Variable(self.b_alpha * tf.random_normal([len(self.class_set)]))
-
-        y_predict = tf.add(tf.matmul(dense, w_out), b_out)
+        # 卷积层 1
+        W_conv1 = self.weigth_variable(shape=[5, 5, 1, 32], name='W_conv1')
+        b_conv1 = self.bias_variable([32], name='b_conv1')
+        h_conv1 = tf.nn.relu(self.conv2d(x, W_conv1) + b_conv1)
+        h_pool1 = self.max_pool_2x2(h_conv1)
+        # 卷积层 2
+        W_conv2 = self.weigth_variable([5, 5, 32, 64])
+        b_conv2 = self.bias_variable([64])
+        h_conv2 = tf.nn.relu(self.conv2d(h_pool1, W_conv2) + b_conv2)
+        h_pool2 = self.max_pool_2x2(h_conv2)
+        # 全连接层 1
+        W_fc1 = self.weigth_variable([17 * 17 * 64, 1024])
+        b_fc1 = self.bias_variable([1024])
+        print('h_pool2.shape: ', h_pool2.shape)
+        h_pool2_flat = tf.reshape(h_pool2, [-1, 17 * 17 * 64])
+        h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob=self.keep_prob)
+        # 全连接层 2
+        W_fc2 = self.weigth_variable([1024, len(self.class_set)])
+        b_fc2 = self.bias_variable([len(self.class_set)])
+        y_predict = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2, name='softmax')
 
         return y_predict

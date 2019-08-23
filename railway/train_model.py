@@ -78,7 +78,7 @@ class TrainModel(CNN):
     def train(self):
         y_predict = self.model()
         cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=y_predict, labels=self.Y_))
-        optimizer = tf.train.AdamOptimizer(learning_rate=0.0001).minimize(cost)
+        optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(cost)
         # 计算准确率
         current_prediction = tf.equal(tf.argmax(y_predict, 1), tf.argmax(self.Y_, 1))
         accuracy = tf.reduce_mean(tf.cast(current_prediction, tf.float32))
