@@ -109,7 +109,7 @@ TensorFlow 常数生成函数：
 
 常用的激活函数：
 
-![tf_in_action_03](./images./tf_in_action_03.png)
+![tf_in_action_03](./images/tf_in_action_03.png)
 
 ### 2.2 损失函数的定义
 
