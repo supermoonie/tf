@@ -8,6 +8,12 @@ import time
 from PIL import Image
 import random
 import os
+import sys
+
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(rootPath)
+
 from network import CNN
 
 
@@ -79,7 +85,7 @@ class TrainModel(CNN):
         :return:tuple (str, numpy.array)
         """
         # 标签
-        label = img_name.split("-")[0]
+        label = img_name.split("_")[0]
         # 文件
         img_file = os.path.join(img_path, img_name)
         captcha_image = Image.open(img_file)

@@ -1,8 +1,8 @@
 {
-  "origin_image_dir": "D:/BaiduNetdiskDownload/20181211/data/export/crawler_captcha/correct/",
+  "origin_image_dir": "D:/data/20181216/100x60/",
   "new_image_dir": "sample/new_train/",
-  "train_image_dir": "D:/BaiduNetdiskDownload/20181211/data/export/crawler_captcha/correct/",
-  "test_image_dir": "sample/test/",
+  "train_image_dir": "D:/data/20181216/train/",
+  "test_image_dir": "D:/data/20181216/test/",
   "api_image_dir": "sample/api/",
   "online_image_dir": "sample/online/",
   "local_image_dir": "sample/local/",
