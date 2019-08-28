@@ -204,3 +204,13 @@ $$
   正则化的基本思想就是希望通过限制权重的大小，使得模型不能任意拟合训练数据中的随机噪音。L1 与 L2 的区别是：L1 正则化会让参数变得稀疏，L2不会。所谓参数变得稀疏是指会有更多的参数变为 0，这样可以达到类似选取特征的功能。L2不会让参数变得稀疏的原因是因为当参数很小时，这个参数的平方基本上就可以忽略不计了，于是模型不会进一步将这个参数调整为 0。其次，L1 的计算公式不可导，L2 公式可导，
 
 - 滑动平均模型
+
+  滑动平均模型在一定程度上可以提高最终模型在测试数据上的表现，TensorFlow 提供了 tf.train.ExponentialMovingAverage 来实现滑动平均模型。ExponentialMovingAverage 对每一个变量维护了一个影子变量（shadow_variable），每次变量更新时，影子变量的值会更新为：
+
+  shadow_variable = decay * shadow_variable + (1-decay) * variable，ExponentialMovingAverage 还提供了 num_updates 参数来动态设置 decay 的大小。如果在 ExponentialMovingAverage 初始化时提供了 num_updates 参数，那么每次使用的衰减率为：
+  $$
+  \min\lbrace
+  decay, \; \frac{1 + num\_updates}{10 + num\_updates}
+  \rbrace
+  $$
+  
