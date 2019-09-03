@@ -214,3 +214,7 @@ $$
   \rbrace
   $$
   
+
+### 2.5 TensorFlow 模型持久化
+
+TensorFlow 通过元图（MetaGraph）来记录计算图中节点的信息以及运算计算图中节点所需的元数据。TensorFlow 中元图是由 MetaGraphDef Protocol Buffer 定义的。MetaGraphDef 中的内容就构成了 TensorFlow 持久化的第一个文件，以 .meta 为后缀名。TensorFlow 提供了 export_meta_graph 函数，这个函数支持以 json 格式导出 MetaGraphDef Protocol Buffer 
