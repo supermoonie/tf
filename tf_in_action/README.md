@@ -46,7 +46,7 @@ TensorFlow 也自动管理了一些集合：
 
 张量的名字不仅是张量的唯一标识符，同样也给出了张量是如何计算的。
 
-TensorFlow 支持14 中类型：实数（tf.float32、tf.float64）、整数（tf.int8、tf.int16、tf.int32、tf.int64、tf.uint8）和复数（tf.complex64、tf.complex128）
+TensorFlow 支持14 钟类型：实数（tf.float32、tf.float64）、整数（tf.int8、tf.int16、tf.int32、tf.int64、tf.uint8）和复数（tf.complex64、tf.complex128）
 
 张量主要用于：
 
@@ -166,7 +166,7 @@ $$
 
 - 学习率（leaning rate）的设置
 
-  学习率过大，将不会收敛到一个极小值，消息率过小，会降低优化速度
+  学习率过大，将不会收敛到一个极小值，学习率过小，会降低优化速度
 
   TensorFlow 的指数衰减法：tf.train.exponential_decay 它实现了以下代码的功能：
 
@@ -218,3 +218,18 @@ $$
 ### 2.5 TensorFlow 模型持久化
 
 TensorFlow 通过元图（MetaGraph）来记录计算图中节点的信息以及运算计算图中节点所需的元数据。TensorFlow 中元图是由 MetaGraphDef Protocol Buffer 定义的。MetaGraphDef 中的内容就构成了 TensorFlow 持久化的第一个文件，以 .meta 为后缀名。TensorFlow 提供了 export_meta_graph 函数，这个函数支持以 json 格式导出 MetaGraphDef Protocol Buffer 
+
+## 3、卷积神经网络（Convolutional Neural Network， CNN）
+
+### 3.1 卷积神经网络的5 种结构组成
+
+1. 输入层
+2. 卷积层，卷积层中每一个节点的输入只是上一层神经网络的一小块（3x3 或 5x5 等）
+3. 池化层（Pooling），缩小矩阵的大小，降低图片分辨率，减少参数
+4. 全连接层
+5. Softmax 层
+
+### 3.2 卷积层
+
+
+

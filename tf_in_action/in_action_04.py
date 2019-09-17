@@ -2,6 +2,7 @@ import tensorflow as tf
 
 
 def cross_entropy():
+    # reduce_mean 用于计算张量沿着指定的数轴上的平均值
     cross = -tf.reduce_mean([1, 0, 0] * tf.log(tf.clip_by_value([0.2, 0.7, 0.1], 1e-10, 1.0)))
     with tf.Session() as sess:
         cross_value = sess.run(cross)
@@ -10,6 +11,7 @@ def cross_entropy():
 
 def tf_clip_by_value():
     v = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    # 将数据转化为 2.5-4.5 之间，小于2.5 的改为 2.5，大于4.5 的改为 4.5
     clip = tf.clip_by_value(v, 2.5, 4.5)
     with tf.Session() as sess:
         v_v = sess.run(clip)
@@ -23,6 +25,7 @@ def tf_softmax_cross_entropy_with_logits():
         print(cross_value)
 
 
+# 指数衰减
 def tf_exponential_decay():
     global_step = tf.Variable(0)
     learning_rate = tf.train.exponential_decay(
