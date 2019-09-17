@@ -26,7 +26,7 @@ g_1 = tf.Graph()
         print(tf.get_default_graph())
 ```
 
-​	在一个计算图中，可以通过集合（collection）来管理不通类别的资源。例如通过 tf.add_to_collection 可以将资源加入一个或多个集合中，然后通过 tf.get_collection 过去一个集合里面所有的资源。
+​	在一个计算图中，可以通过集合（collection）来管理不通类别的资源。例如通过 tf.add_to_collection 可以将资源加入一个或多个集合中，然后通过 tf.get_collection 获取一个集合里面所有的资源。
 
 TensorFlow 也自动管理了一些集合：
 
